@@ -1,0 +1,7 @@
+# ---> Elisp
+# Compiled
+*.elc
+
+# Packaging
+.cask
+
