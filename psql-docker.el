@@ -21,7 +21,7 @@ Starts `sql-interactive-mode' after doing some setup."
   :type 'string
   :group 'SQL)
 
-(defcustom sql-docker-psql-options nil
+(defcustom sql-docker-psql-options '("-P" "pager=off")
   "List of additional options to start psql in Docker container."
   :type '(repeat string)
   :group 'SQL)
