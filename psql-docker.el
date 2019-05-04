@@ -16,7 +16,7 @@ Starts `sql-interactive-mode' after doing some setup."
   :type '(repeat string)
   :group 'SQL)
 
-(defcustom sql-docker-psql-container "pg11"
+(defcustom sql-docker-psql-container ""
   "Name of Docker container to start psql in."
   :type 'string
   :group 'SQL)
@@ -29,6 +29,7 @@ Starts `sql-interactive-mode' after doing some setup."
 (defun sql-comint-docker-psql (product options &optional buf-name)
   "Connect to Docker psql in a comint buffer."
   (let ((params options))
+    (sql-get-login-ext 'sql-docker-psql-container "Container name: " nil nil)
     (if (not (string= "" sql-database))
         (setq params (append (list "-d" sql-database) params)))
     (if (not (string= "" sql-password))
