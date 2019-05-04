@@ -47,9 +47,9 @@ Starts `sql-interactive-mode' after doing some setup."
       (display "docker-psql")
       (plist '(:free-software t
                :sqli-program sql-docker-psql-program
-	       :prompt-regexp "^[[:alnum:]_]*=[#>] "
-	       :prompt-length 5
-	       :prompt-cont-regexp "^[[:alnum:]_]*[-(][#>] "
+               :prompt-regexp "^[[:alnum:]_]*=[#>] "
+               :prompt-length 5
+               :prompt-cont-regexp "^[[:alnum:]_]*[-(][#>] "
                :sqli-login sql-postgres-login-params
                :sqli-options sql-docker-psql-options
                :sqli-comint-func sql-comint-docker-psql)))
