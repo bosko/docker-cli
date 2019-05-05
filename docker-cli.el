@@ -1,12 +1,12 @@
 (require 'comint)
 
-(defvar docker-cmd "docker"
+(defvar docker-cli-cmd "docker"
   "Docker command")
 
-(defvar docker-arguments '("exec" "--user" "postgres" "-it" "pg11" "psql" "-P" "pager=off")
+(defvar docker-cli-arguments '("exec" "--user" "postgres" "-it" "pg11" "psql" "-P" "pager=off")
   "Commandline arguments to pass to docker")
 
-(defvar docker-mode-map
+(defvar docker-cli-mode-map
   (let ((map (nconc (make-sparse-keymap) comint-mode-map)))
     ;; example definition
     (define-key map "\t" 'completion-at-point)
@@ -15,65 +15,65 @@
 
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
-(defvar docker-prompt-regexp "^[[:alnum:]_]*=[#>] "
+(defvar docker-cli-prompt-regexp "^[[:alnum:]_]*=[#>] "
   "Prompt for `run-docker'.")
 
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
-(defvar docker-prompt-cont-regexp "^[[:alnum:]_]*=[#>] "
+(defvar docker-cli-prompt-cont-regexp "^[[:alnum:]_]*=[#>] "
   "Prompt pattern for continuation prompt.")
 
 (defun run-docker ()
   "Run an inferior instance of `docker' inside Emacs."
   (interactive)
-  (let* ((docker-program docker-cmd)
+  (let* ((docker-cli-program docker-cli-cmd)
          (buffer (comint-check-proc "Docker")))
 
     ;; pop to the "*Docker*" buffer if the process is dead, the
     ;; buffer is missing or it's got the wrong mode.
     (pop-to-buffer-same-window
-     (if (or buffer (not (derived-mode-p 'docker-mode))
+     (if (or buffer (not (derived-mode-p 'docker-cli-mode))
              (comint-check-proc (current-buffer)))
          (get-buffer-create (or buffer "*Docker*"))
        (current-buffer)))
     ;; create the comint process if there is no buffer.
     (unless buffer
       (apply 'make-comint-in-buffer "Docker" buffer
-             docker-program nil docker-arguments)
-      (docker-mode))))
+             docker-cli-program nil docker-cli-arguments)
+      (docker-cli-mode))))
 
-(defun docker--initialize ()
+(defun docker-cli--initialize ()
   "Helper function to initialize Docker"
   (setq comint-process-echoes t)
   (setq comint-use-prompt-regexp t)
-  (set (make-local-variable 'font-lock-defaults) '(docker-font-lock-keywords t)))
+  (set (make-local-variable 'font-lock-defaults) '(docker-cli-font-lock-keywords t)))
 
-(defconst docker-keywords
+(defconst docker-cli-keywords
   '("select" "from" "where" "into" "order" "group by"))
 
-(defvar docker-font-lock-keywords
+(defvar docker-cli-font-lock-keywords
   (list
    ;; highlight all the reserved commands.
-   `(,(concat "\\_<" (regexp-opt docker-keywords) "\\_>") . font-lock-keyword-face))
-  "Additional expressions to highlight in `docker-mode'.")
+   `(,(concat "\\_<" (regexp-opt docker-cli-keywords) "\\_>") . font-lock-keyword-face))
+  "Additional expressions to highlight in `docker-cli-mode'.")
 
-(define-derived-mode docker-mode comint-mode "Docker"
+(define-derived-mode docker-cli-mode comint-mode "Docker"
   "Major mode for `run-docker'.
 
-\\<docker-mode-map>"
+\\<docker-cli-mode-map>"
   ;; this sets up the prompt so it matches things like: [foo@bar]
   (setq comint-prompt-regexp
-        (if docker-prompt-cont-regexp
-            (concat "\\(" docker-prompt-regexp
-                    "\\|" docker-prompt-cont-regexp "\\)")
-          docker-prompt-regexp))
+        (if docker-cli-prompt-cont-regexp
+            (concat "\\(" docker-cli-prompt-regexp
+                    "\\|" docker-cli-prompt-cont-regexp "\\)")
+          docker-cli-prompt-regexp))
   ;; this makes it read only; a contentious subject as some prefer the
   ;; buffer to be overwritable.
   (setq comint-prompt-read-only t)
   ;; this makes it so commands like M-{ and M-} work.
   (set (make-local-variable 'paragraph-separate) "\\'")
-  (set (make-local-variable 'font-lock-defaults) '(docker-font-lock-keywords t))
-  (set (make-local-variable 'paragraph-start) docker-prompt-regexp))
+  (set (make-local-variable 'font-lock-defaults) '(docker-cli-font-lock-keywords t))
+  (set (make-local-variable 'paragraph-start) docker-cli-prompt-regexp))
 
 ;; this has to be done in a hook. grumble grumble.
-(add-hook 'docker-mode-hook 'docker--initialize)
+(add-hook 'docker-cli-mode-hook 'docker-cli--initialize)
