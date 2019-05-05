@@ -1,7 +1,9 @@
-(defvar docker-cmd "/usr/local/bin/docker"
+(require 'comint)
+
+(defvar docker-cmd "docker"
   "Docker command")
 
-(defvar docker-arguments '("" "exec" "--user" "postgres" "-it" "pg10" "psql")
+(defvar docker-arguments '("exec" "--user" "postgres" "-it" "pg11" "psql")
   "Commandline arguments to pass to docker")
 
 (defvar docker-mode-map
@@ -11,14 +13,22 @@
     map)
   "Basic mode map for `run-docker'")
 
-(defvar docker-prompt-regexp "^[[:alnum:]]*[=#] *"
+;; This value is for psql. It should be nil here and
+;; set depending of command started
+(defvar docker-prompt-regexp "^[[:alnum:]_]*=[#>] "
   "Prompt for `run-docker'.")
+
+;; This value is for psql. It should be nil here and
+;; set depending of command started
+(defvar docker-prompt-cont-regexp "^[[:alnum:]_]*=[#>] "
+  "Prompt pattern for continuation prompt.")
 
 (defun run-docker ()
   "Run an inferior instance of `docker' inside Emacs."
   (interactive)
   (let* ((docker-program docker-cmd)
          (buffer (comint-check-proc "Docker")))
+
     ;; pop to the "*Docker*" buffer if the process is dead, the
     ;; buffer is missing or it's got the wrong mode.
     (pop-to-buffer-same-window
@@ -29,7 +39,7 @@
     ;; create the comint process if there is no buffer.
     (unless buffer
       (apply 'make-comint-in-buffer "Docker" buffer
-             docker-program docker-arguments)
+             docker-program nil docker-arguments)
       (docker-mode))))
 
 (defun docker--initialize ()
@@ -52,7 +62,11 @@
 
 \\<docker-mode-map>"
   ;; this sets up the prompt so it matches things like: [foo@bar]
-  (setq comint-prompt-regexp docker-prompt-regexp)
+  (setq comint-prompt-regexp
+        (if docker-prompt-cont-regexp
+            (concat "\\(" docker-prompt-regexp
+                    "\\|" docker-prompt-cont-regexp "\\)")
+          docker-prompt-regexp))
   ;; this makes it read only; a contentious subject as some prefer the
   ;; buffer to be overwritable.
   (setq comint-prompt-read-only t)
