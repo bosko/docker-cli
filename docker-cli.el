@@ -3,7 +3,7 @@
 (defvar docker-cmd "docker"
   "Docker command")
 
-(defvar docker-arguments '("exec" "--user" "postgres" "-it" "pg11" "psql")
+(defvar docker-arguments '("exec" "--user" "postgres" "-it" "pg11" "psql" "-P" "pager=off")
   "Commandline arguments to pass to docker")
 
 (defvar docker-mode-map
