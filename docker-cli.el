@@ -3,8 +3,22 @@
 (defvar docker-cli-cmd "docker"
   "Docker command")
 
-(defvar docker-cli-arguments '("exec" "--user" "postgres" "-it" "pg11" "psql" "-P" "pager=off")
+(defvar docker-cli-exec-arguments '("exec" "-it")
   "Commandline arguments to pass to docker")
+
+(defvar docker-cli-curr-command nil
+  "Current selected command")
+
+(defvar docker-cli-commands-alist
+  '((psql
+     :command "psql"
+     :arguments ("-U" "postgres" "-P" "pager=off"))
+
+    (redis-cli
+     :command "redis-cli"
+     :arguments nil)
+    )
+  "An alist of defined commands that can be ran in docker container.")
 
 (defvar docker-cli-mode-map
   (let ((map (nconc (make-sparse-keymap) comint-mode-map)))
@@ -23,11 +37,22 @@
 (defvar docker-cli-prompt-cont-regexp "^[[:alnum:]_]*=[#>] "
   "Prompt pattern for continuation prompt.")
 
+(defun docker-cli-select-command ()
+  (let ((commands (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist))))
+    (ido-completing-read "Command: " commands)))
+
+(defun docker-cli-compose-params ()
+  (let* ((curr-command-name (docker-cli-select-command))
+         (curr-command (cdr (assoc (intern curr-command-name) docker-cli-commands-alist)))
+         (params (plist-get curr-command :arguments)))
+    (setq params (cons (plist-get curr-command :command) params))
+    (setq params (cons "pg11" params))
+    (setq params (append docker-cli-exec-arguments params))))
+
 (defun run-docker ()
   "Run an inferior instance of `docker' inside Emacs."
   (interactive)
-  (let* ((docker-cli-program docker-cli-cmd)
-         (buffer (comint-check-proc "Docker")))
+  (let* ((buffer (comint-check-proc "Docker")))
 
     ;; pop to the "*Docker*" buffer if the process is dead, the
     ;; buffer is missing or it's got the wrong mode.
@@ -39,7 +64,7 @@
     ;; create the comint process if there is no buffer.
     (unless buffer
       (apply 'make-comint-in-buffer "Docker" buffer
-             docker-cli-program nil docker-cli-arguments)
+             docker-cli-cmd nil (docker-cli-compose-params))
       (docker-cli-mode))))
 
 (defun docker-cli--initialize ()
