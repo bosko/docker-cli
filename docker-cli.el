@@ -66,7 +66,7 @@
 
     (redis-cli
      :command "redis-cli"
-     :arguments-compose-func docker-cli-redis-arguments
+     :arguments-compose-func nil
      :prompt-regexp "^[a-zA-Z0-9_.-]+:[0-9]+\\(\\[[0-9]\\]\\)?> "
      :prompt-cont-regexp "^[a-zA-Z0-9_.-]+:[0-9]+\\(\\[[0-9]\\]\\)?> "))
   "An alist of defined commands that can be ran in docker container.
@@ -135,9 +135,6 @@ New commands can be supported by adding new element to this list.")
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
   `("-u" ,docker-cli-db-username "-h" ,docker-cli-host "-p" ,docker-cli-db-name)
   )
-
-(defun docker-cli-redis-arguments ()
-  '("-e" "TERM=dumb"))
 
 (defun docker-cli-select-option (prompt options)
   (ido-completing-read prompt options))
