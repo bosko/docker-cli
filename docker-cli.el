@@ -1,3 +1,33 @@
+;;; docker-cli.el --- running various commands in docker containers
+;; Copyright 2019 by Boško Ivanišević <bosko.ivanisevic@gmail.com>
+
+;; Author: Boško Ivanišević <bosko.ivanisevic@gmail.com>
+;; Version: 1.0
+;; Keywords: docker
+;; URL: https://github.com/bosko/docker-cli
+
+;; This program is free software: you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by the
+;; Free Software Foundation, either version 3 of the License, or (at your
+;; option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+;; Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License along
+;; with this program. If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;;
+;; docker-cli provides mode for running commands within Docker containers
+;; in Emacs buffer. Package comes with few predefined commands for running
+;; PostgreSQL, Redis and MySQL clients and Rails console. Package can easily
+;; be extended with new commands by adding elements to `docker-cli-commands-alist'.
+
+;;; Code:
+
 (require 'comint)
 
 (defvar docker-cli-cmd "docker"
@@ -10,14 +40,21 @@
   "Current selected command")
 
 (defvar docker-cli-commands-alist
-  '((psql
+  '((sh
+     :command "/bin/sh"
+     :arguments-compose-func nil)
+
+    (bash
+     :command "/bin/bash"
+     :arguments-compose-func nil)
+
+    (psql
      :command "psql"
      :arguments-compose-func docker-cli-psql-arguments)
 
     (redis-cli
      :command "redis-cli"
-     :arguments-compose-func nil)
-    )
+     :arguments-compose-func nil))
   "An alist of defined commands that can be ran in docker container.
 
 Each element in the list must be of the following format:
@@ -88,12 +125,13 @@ New commands can be supported by adding new element to this list.")
                              "Command: "
                              (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist))))
          (curr-command (cdr (assoc (intern curr-command-name) docker-cli-commands-alist)))
-         (params (apply (plist-get curr-command :arguments-compose-func) nil)))
-    (setq params (cons (plist-get curr-command :command) params))
+         (params (if (plist-get curr-command :arguments-compose-func)
+                     (apply (plist-get curr-command :arguments-compose-func) nil))))
+    (setq params (cons (plist-get curr-command :command) (or params '())))
     (setq params (cons container params))
     (setq params (append docker-cli-exec-arguments params))))
 
-(defun run-docker ()
+(defun docker-cli-run-cmd ()
   "Run an inferior instance of `docker' inside Emacs."
   (interactive)
   (let* ((buffer (comint-check-proc "Docker")))
@@ -146,3 +184,7 @@ New commands can be supported by adding new element to this list.")
 
 ;; this has to be done in a hook. grumble grumble.
 (add-hook 'docker-cli-mode-hook 'docker-cli--initialize)
+
+(provide 'docker-cli)
+
+;;; docker-cli.el ends here
