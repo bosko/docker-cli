@@ -42,19 +42,33 @@
 (defvar docker-cli-commands-alist
   '((sh
      :command "/bin/sh"
-     :arguments-compose-func nil)
+     :arguments-compose-func nil
+     :prompt-regexp "^[[:alnum:]_]*=[#>] "
+     :prompt-cont-regexp "^[[:alnum:]_]*=[#>] ")
 
     (bash
      :command "/bin/bash"
-     :arguments-compose-func nil)
+     :arguments-compose-func nil
+     :prompt-regexp "^[[:alnum:]_]*=[#>] "
+     :prompt-cont-regexp "^[[:alnum:]_]*=[#>] ")
 
     (psql
      :command "psql"
-     :arguments-compose-func docker-cli-psql-arguments)
+     :arguments-compose-func docker-cli-psql-arguments
+     :prompt-regexp "^[[:alnum:]_]*=[#>] "
+     :prompt-cont-regexp "^[[:alnum:]_]*=[#>] ")
+
+    (mysql
+     :command "mysql"
+     :arguments-compose-func docker-cli-mysql-arguments
+     :prompt-regexp "^[[:alnum:]_]*=[#>] "
+     :prompt-cont-regexp "^[[:alnum:]_]*=[#>] ")
 
     (redis-cli
      :command "redis-cli"
-     :arguments-compose-func nil))
+     :arguments-compose-func docker-cli-redis-arguments
+     :prompt-regexp "^[a-zA-Z0-9_.-]+:[0-9]+\\(\\[[0-9]\\]\\)?> "
+     :prompt-cont-regexp "^[a-zA-Z0-9_.-]+:[0-9]+\\(\\[[0-9]\\]\\)?> "))
   "An alist of defined commands that can be ran in docker container.
 
 Each element in the list must be of the following format:
@@ -98,12 +112,12 @@ New commands can be supported by adding new element to this list.")
 
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
-(defvar docker-cli-prompt-regexp "^[[:alnum:]_]*=[#>] "
+(defvar docker-cli-prompt-regexp nil
   "Prompt for `run-docker'.")
 
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
-(defvar docker-cli-prompt-cont-regexp "^[[:alnum:]_]*=[#>] "
+(defvar docker-cli-prompt-cont-regexp nil
   "Prompt pattern for continuation prompt.")
 
 (defun docker-cli-psql-arguments ()
@@ -113,6 +127,17 @@ New commands can be supported by adding new element to this list.")
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
   `("-U" ,docker-cli-db-username "-h" ,docker-cli-host "-P" "pager=off" ,docker-cli-db-name)
   )
+
+(defun docker-cli-mysql-arguments ()
+  "Composes arguments for running PSQL in docker container"
+  (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
+  (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
+  (setq docker-cli-host (read-string "Host: " docker-cli-host))
+  `("-u" ,docker-cli-db-username "-h" ,docker-cli-host "-p" ,docker-cli-db-name)
+  )
+
+(defun docker-cli-redis-arguments ()
+  '("-e" "TERM=dumb"))
 
 (defun docker-cli-select-option (prompt options)
   (ido-completing-read prompt options))
@@ -127,6 +152,8 @@ New commands can be supported by adding new element to this list.")
          (curr-command (cdr (assoc (intern curr-command-name) docker-cli-commands-alist)))
          (params (if (plist-get curr-command :arguments-compose-func)
                      (apply (plist-get curr-command :arguments-compose-func) nil))))
+    (setq docker-cli-prompt-regexp (or (plist-get curr-command :prompt-regexp) ""))
+    (setq docker-cli-prompt-cont-regexp (or (plist-get curr-command :prompt-cont-regexp) ""))
     (setq params (cons (plist-get curr-command :command) (or params '())))
     (setq params (cons container params))
     (setq params (append docker-cli-exec-arguments params))))
