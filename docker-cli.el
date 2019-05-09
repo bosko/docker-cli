@@ -149,14 +149,8 @@ New commands can be supported by adding new element to this list.")
 (defun docker-cli-select-option (prompt options)
   (ido-completing-read prompt options))
 
-(defun docker-cli-compose-params ()
-  (let* ((container (docker-cli-select-option
-                     "Container: "
-                     (split-string (shell-command-to-string "docker ps --format '{{.Names}}'"))))
-         (curr-command-name (docker-cli-select-option
-                             "Command: "
-                             (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist))))
-         (curr-command (cdr (assoc (intern curr-command-name) docker-cli-commands-alist)))
+(defun docker-cli-compose-params-for (command-name container)
+  (let* ((curr-command (cdr (assoc (intern command-name) docker-cli-commands-alist)))
          (params (if (plist-get curr-command :arguments-compose-func)
                      (apply (plist-get curr-command :arguments-compose-func) nil))))
     (setq docker-cli-prompt-regexp (or (plist-get curr-command :prompt-regexp) ""))
@@ -168,8 +162,13 @@ New commands can be supported by adding new element to this list.")
 (defun docker-cli-run-cmd ()
   "Run an inferior instance of `docker' inside Emacs."
   (interactive)
-  (let* ((buffer (comint-check-proc "Docker")))
-
+  (let* ((curr-command-name (docker-cli-select-option
+                             "Command: "
+                             (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist))))
+         (container (docker-cli-select-option
+                     "Container: "
+                     (split-string (shell-command-to-string "docker ps --format '{{.Names}}'"))))
+         (buffer (comint-check-proc "Docker")))
     ;; pop to the "*Docker*" buffer if the process is dead, the
     ;; buffer is missing or it's got the wrong mode.
     (pop-to-buffer-same-window
@@ -180,7 +179,7 @@ New commands can be supported by adding new element to this list.")
     ;; create the comint process if there is no buffer.
     (unless buffer
       (apply 'make-comint-in-buffer "Docker" buffer
-             docker-cli-cmd nil (docker-cli-compose-params))
+             docker-cli-cmd nil (docker-cli-compose-params-for curr-command-name container))
       (docker-cli-mode))))
 
 (defun docker-cli--initialize ()
