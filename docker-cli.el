@@ -168,19 +168,16 @@ New commands can be supported by adding new element to this list.")
          (container (docker-cli-select-option
                      "Container: "
                      (split-string (shell-command-to-string "docker ps --format '{{.Names}}'"))))
-         (buffer (comint-check-proc "Docker")))
-    ;; pop to the "*Docker*" buffer if the process is dead, the
-    ;; buffer is missing or it's got the wrong mode.
-    (pop-to-buffer-same-window
-     (if (or buffer (not (derived-mode-p 'docker-cli-mode))
-             (comint-check-proc (current-buffer)))
-         (get-buffer-create (or buffer "*Docker*"))
-       (current-buffer)))
-    ;; create the comint process if there is no buffer.
-    (unless buffer
-      (apply 'make-comint-in-buffer "Docker" buffer
-             docker-cli-cmd nil (docker-cli-compose-params-for curr-command-name container))
-      (docker-cli-mode))))
+         (buffer-name (format "%s-%s" container curr-command-name))
+         (buffer (get-buffer-create (format "*%s*" buffer-name))))
+
+    (pop-to-buffer-same-window buffer)
+
+    ;; create the comint process
+    (unless (comint-check-proc buffer)
+      (apply 'make-comint-in-buffer buffer-name buffer
+             docker-cli-cmd nil (docker-cli-compose-params-for curr-command-name container)))
+    (docker-cli-mode)))
 
 (defun docker-cli--initialize ()
   "Helper function to initialize Docker"
