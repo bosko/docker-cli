@@ -1,5 +1,4 @@
 ;;; docker-cli.el --- running various commands in docker containers
-;; Copyright 2019 by Boško Ivanišević <bosko.ivanisevic@gmail.com>
 
 ;; Author: Boško Ivanišević <bosko.ivanisevic@gmail.com>
 ;; Version: 1.0.0
@@ -7,7 +6,7 @@
 ;; URL: https://github.com/bosko/docker-cli
 
 ;; MIT License
-;; Copyright (c) <year> <copyright holders>
+;; Copyright (c) 2019 Boško Ivanišević <bosko.ivanisevic@gmail.com>
 ;;
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -35,6 +34,9 @@
 ;; in Emacs buffer. Package comes with few predefined commands for running
 ;; PostgreSQL, Redis and MySQL clients and Rails console. Package can easily
 ;; be extended with new commands by adding elements to `docker-cli-commands-alist'.
+;; Command is ran with interactive function `docker-cli-run-cmd` which, after
+;; selecting command and container from the list, executes given command in
+;; the target Docker container.
 
 ;;; Code:
 
