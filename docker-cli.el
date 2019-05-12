@@ -25,8 +25,8 @@
 ;;; Commentary:
 ;;
 ;; docker-cli provides mode for running commands within Docker containers
-;; in Emacs buffer. Package comes with few predefined commands for running
-;; PostgreSQL, Redis and MySQL clients and Rails console. Package can easily
+;; in Emacs buffer.  Package comes with few predefined commands for running
+;; PostgreSQL, Redis and MySQL clients and Rails console.  Package can easily
 ;; be extended with new commands by adding elements to `docker-cli-commands-alist'.
 ;; Command is ran with interactive function `docker-cli-run-cmd` which, after
 ;; selecting command and container from the list, executes given command in
@@ -37,13 +37,13 @@
 (require 'comint)
 
 (defvar docker-cli-cmd "docker"
-  "Docker command")
+  "Docker command.")
 
 (defvar docker-cli-exec-arguments '("exec" "-it")
-  "Commandline arguments to pass to docker")
+  "Commandline arguments to pass to docker.")
 
 (defvar docker-cli-curr-command nil
-  "Current selected command")
+  "Current selected command.")
 
 (defvar docker-cli-commands-alist
   '((sh
@@ -82,8 +82,8 @@ Each element in the list must be of the following format:
   (COMMAND-KEY FEATURE VALUE)
 
 where COMMAND-KEY is unique value that determins command and can
-be displayed in selection when `docker-run' is executed. Each key
-is followed by FEATURE-VALUE pairs. Feature can be any of following:
+be displayed in selection when `docker-run' is executed.  Each key
+is followed by FEATURE-VALUE pairs.  Feature can be any of following:
 
   :command                    Command that will be executed in the
                               Docker container.
@@ -99,7 +99,7 @@ New commands can be supported by adding new element to this list.")
     ;; example definition
     (define-key map "\t" 'completion-at-point)
     map)
-  "Basic mode map for `run-docker'")
+  "Basic mode map for `run-docker'.")
 
 (defcustom docker-cli-db-username ""
   "Database username."
@@ -107,12 +107,12 @@ New commands can be supported by adding new element to this list.")
   :group 'DockerCLI)
 
 (defcustom docker-cli-db-name ""
-  "Database name"
+  "Database name."
   :type 'string
   :group 'DockerCLI)
 
 (defcustom docker-cli-host ""
-  "Host name"
+  "Host name."
   :type 'string
   :group 'DockerCLI)
 
@@ -127,7 +127,7 @@ New commands can be supported by adding new element to this list.")
   "Prompt pattern for continuation prompt.")
 
 (defun docker-cli-psql-arguments ()
-  "Composes arguments for running PSQL in docker container"
+  "Composes arguments for running PSQL in docker container."
   (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
   (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
@@ -135,7 +135,7 @@ New commands can be supported by adding new element to this list.")
   )
 
 (defun docker-cli-mysql-arguments ()
-  "Composes arguments for running PSQL in docker container"
+  "Composes arguments for running MySQL client in docker container."
   (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
   (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
@@ -143,9 +143,15 @@ New commands can be supported by adding new element to this list.")
   )
 
 (defun docker-cli-select-option (prompt options)
+  "Abstract option selecting for later possible change.
+Argument PROMPT display prompt.
+Argument OPTIONS IDO completing options."
   (ido-completing-read prompt options))
 
 (defun docker-cli-compose-params-for (command-name container)
+  "Composes params for given command and CONTAINER.
+Argument COMMAND-NAME unique key of command from docker-cli-command-alist.
+Argument CONTAINER name of the target Docker container."
   (let* ((curr-command (cdr (assoc (intern command-name) docker-cli-commands-alist)))
          (params (if (plist-get curr-command :arguments-compose-func)
                      (apply (plist-get curr-command :arguments-compose-func) nil))))
@@ -176,7 +182,7 @@ New commands can be supported by adding new element to this list.")
     (docker-cli-mode)))
 
 (defun docker-cli--initialize ()
-  "Helper function to initialize Docker"
+  "Helper function to initialize Docker."
   (setq comint-process-echoes t)
   (setq comint-use-prompt-regexp t)
   (set (make-local-variable 'font-lock-defaults) '(docker-cli-font-lock-keywords t)))
