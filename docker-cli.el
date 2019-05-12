@@ -2,7 +2,7 @@
 ;; Copyright 2019 by Boško Ivanišević <bosko.ivanisevic@gmail.com>
 
 ;; Author: Boško Ivanišević <bosko.ivanisevic@gmail.com>
-;; Version: 1.0
+;; Version: 1.0.0
 ;; Keywords: docker
 ;; URL: https://github.com/bosko/docker-cli
 
