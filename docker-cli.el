@@ -2,7 +2,7 @@
 
 ;; Author: Boško Ivanišević <bosko.ivanisevic@gmail.com>
 ;; Version: 1.0.0
-;; Keywords: docker
+;; Keywords: processes
 ;; URL: https://github.com/bosko/docker-cli
 
 ;; This file is not part of GNU Emacs.
