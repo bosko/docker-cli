@@ -197,7 +197,7 @@ Argument CONTAINER name of the target Docker container."
   "Additional expressions to highlight in `docker-cli-mode'.")
 
 (define-derived-mode docker-cli-mode comint-mode "Docker"
-  "Major mode for `run-docker'.
+  "Major mode for running commands in Docker containers.
 
 \\<docker-cli-mode-map>"
   ;; this sets up the prompt so it matches things like: [foo@bar]
