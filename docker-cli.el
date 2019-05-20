@@ -1,4 +1,4 @@
-;;; docker-cli.el --- running various commands in docker containers
+;;; docker-cli.el --- Running various commands in docker containers
 
 ;; Author: Boško Ivanišević <bosko.ivanisevic@gmail.com>
 ;; Version: 1.0.0
