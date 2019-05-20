@@ -134,7 +134,7 @@ New commands can be supported by adding new element to this list.")
   `("-U" ,docker-cli-db-username "-h" ,docker-cli-host "-P" "pager=off" ,docker-cli-db-name))
 
 (defun docker-cli-mysql-arguments ()
-  "Composes arguments for running MySQL client in docker container."
+  "Composes arguments for running MySQL client in Docker container."
   (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
   (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
