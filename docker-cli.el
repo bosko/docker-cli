@@ -131,22 +131,14 @@ New commands can be supported by adding new element to this list.")
   (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
   (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
-  `("-U" ,docker-cli-db-username "-h" ,docker-cli-host "-P" "pager=off" ,docker-cli-db-name)
-  )
+  `("-U" ,docker-cli-db-username "-h" ,docker-cli-host "-P" "pager=off" ,docker-cli-db-name))
 
 (defun docker-cli-mysql-arguments ()
   "Composes arguments for running MySQL client in docker container."
   (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
   (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
-  `("-u" ,docker-cli-db-username "-h" ,docker-cli-host "-p" ,docker-cli-db-name)
-  )
-
-(defun docker-cli-select-option (prompt options)
-  "Abstract option selecting for later possible change.
-Argument PROMPT display prompt.
-Argument OPTIONS IDO completing options."
-  (ido-completing-read prompt options))
+  `("-u" ,docker-cli-db-username "-h" ,docker-cli-host "-p" ,docker-cli-db-name))
 
 (defun docker-cli-compose-params-for (command-name container)
   "Composes params for given command and CONTAINER.
@@ -161,13 +153,13 @@ Argument CONTAINER name of the target Docker container."
     (setq params (cons container params))
     (setq params (append docker-cli-exec-arguments params))))
 
-(defun docker-cli-run-cmd ()
+(defun docker-cli ()
   "Run an inferior instance of `docker' inside Emacs."
   (interactive)
-  (let* ((curr-command-name (docker-cli-select-option
+  (let* ((curr-command-name (completing-read
                              "Command: "
                              (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist))))
-         (container (docker-cli-select-option
+         (container (completing-read
                      "Container: "
                      (split-string (shell-command-to-string "docker ps --format '{{.Names}}'"))))
          (buffer-name (format "%s-%s" container curr-command-name))
