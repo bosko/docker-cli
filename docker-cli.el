@@ -99,7 +99,7 @@ New commands can be supported by adding new element to this list.")
     ;; example definition
     (define-key map "\t" 'completion-at-point)
     map)
-  "Basic mode map for `run-docker'.")
+  "Basic mode map for `docker-cli'.")
 
 (defcustom docker-cli-db-username ""
   "Database username."
@@ -119,7 +119,7 @@ New commands can be supported by adding new element to this list.")
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
 (defvar docker-cli-prompt-regexp nil
-  "Prompt for `run-docker'.")
+  "Prompt for `docker-cli'.")
 
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
