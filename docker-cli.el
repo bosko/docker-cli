@@ -127,7 +127,7 @@ New commands can be supported by adding new element to this list.")
   "Prompt pattern for continuation prompt.")
 
 (defun docker-cli-psql-arguments ()
-  "Composes arguments for running PSQL in docker container."
+  "Composes arguments for running psql in docker container."
   (setq docker-cli-db-username (read-string "Username: " docker-cli-db-username))
   (setq docker-cli-db-name (read-string "Database: " docker-cli-db-name))
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
