@@ -36,6 +36,21 @@
 
 (require 'comint)
 
+(defcustom docker-cli-db-username ""
+  "Database username."
+  :type 'string
+  :group 'docker-cli)
+
+(defcustom docker-cli-db-name ""
+  "Database name."
+  :type 'string
+  :group 'docker-cli)
+
+(defcustom docker-cli-host ""
+  "Host name."
+  :type 'string
+  :group 'docker-cli)
+
 (defvar docker-cli-cmd "docker"
   "Docker command.")
 
@@ -100,21 +115,6 @@ New commands can be supported by adding new element to this list.")
     (define-key map "\t" 'completion-at-point)
     map)
   "Basic mode map for `docker-cli'.")
-
-(defcustom docker-cli-db-username ""
-  "Database username."
-  :type 'string
-  :group 'docker-cli)
-
-(defcustom docker-cli-db-name ""
-  "Database name."
-  :type 'string
-  :group 'docker-cli)
-
-(defcustom docker-cli-host ""
-  "Host name."
-  :type 'string
-  :group 'docker-cli)
 
 ;; This value is for psql. It should be nil here and
 ;; set depending of command started
