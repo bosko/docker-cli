@@ -81,7 +81,7 @@ Each element in the list must be of the following format:
 
   (COMMAND-KEY FEATURE VALUE)
 
-where COMMAND-KEY is unique value that determins command and can
+where COMMAND-KEY is unique value that determines command and can
 be displayed in selection when `docker-run' is executed.  Each key
 is followed by FEATURE-VALUE pairs.  Feature can be any of following:
 
