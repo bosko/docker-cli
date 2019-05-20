@@ -176,17 +176,7 @@ Argument CONTAINER name of the target Docker container."
 (defun docker-cli--initialize ()
   "Helper function to initialize Docker."
   (setq comint-process-echoes t)
-  (setq comint-use-prompt-regexp t)
-  (set (make-local-variable 'font-lock-defaults) '(docker-cli-font-lock-keywords t)))
-
-(defconst docker-cli-keywords
-  '("select" "from" "where" "into" "order" "group by"))
-
-(defvar docker-cli-font-lock-keywords
-  (list
-   ;; highlight all the reserved commands.
-   `(,(concat "\\_<" (regexp-opt docker-cli-keywords) "\\_>") . font-lock-keyword-face))
-  "Additional expressions to highlight in `docker-cli-mode'.")
+  (setq comint-use-prompt-regexp t))
 
 (define-derived-mode docker-cli-mode comint-mode "Docker"
   "Major mode for running commands in Docker containers.
@@ -203,7 +193,6 @@ Argument CONTAINER name of the target Docker container."
   (setq comint-prompt-read-only t)
   ;; this makes it so commands like M-{ and M-} work.
   (set (make-local-variable 'paragraph-separate) "\\'")
-  (set (make-local-variable 'font-lock-defaults) '(docker-cli-font-lock-keywords t))
   (set (make-local-variable 'paragraph-start) docker-cli-prompt-regexp))
 
 ;; this has to be done in a hook. grumble grumble.
