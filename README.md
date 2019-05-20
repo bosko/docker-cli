@@ -7,7 +7,7 @@ Running various CLI in Docker within Emacs buffer
 The best way to install it is from MELPA
 
 `
-M-x package-install [RET] inf-ruby [RET]
+M-x package-install [RET] docker-cli [RET]
 `
 
 Manually package can be installed by putting `docker-cli.el` somewhere
