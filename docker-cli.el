@@ -88,6 +88,7 @@
 
     (redis-cli
      :command "redis-cli"
+     :exec-arguments-func docker-cli-redis-exec-arguments
      :arguments-compose-func nil
      :prompt-regexp "^[a-zA-Z0-9_.-]+:[0-9]+\\(\\[[0-9]\\]\\)?> "
      :prompt-cont-regexp "^[a-zA-Z0-9_.-]+:[0-9]+\\(\\[[0-9]\\]\\)?> "))
@@ -103,6 +104,11 @@ is followed by FEATURE-VALUE pairs.  Feature can be any of following:
 
   :command                    Command that will be executed in the
                               Docker container.
+
+  :exec-arguments-func        Function without arguments that should
+                              return Docker exec arguments. Value
+                              returned by this fuction will be used
+                              instead of `docker-cli-exec-arguments'.
 
   :arguments-compose-func     Function without arguments that will be
                               called in order to fetch all command
@@ -141,6 +147,10 @@ New commands can be supported by adding new element to this list.")
   (setq docker-cli-host (read-string "Host: " docker-cli-host))
   `("-u" ,docker-cli-db-username "-h" ,docker-cli-host "-p" ,docker-cli-db-name))
 
+(defun docker-cli-redis-exec-arguments ()
+  "Composes arguments for running Redis client in docker container."
+  '("exec" "-it" "-e" "TERM=dumb"))
+
 (defun docker-cli-compose-params-for (command-name container)
   "Composes params for given command and CONTAINER.
 Argument COMMAND-NAME unique key of command from docker-cli-command-alist.
@@ -152,7 +162,9 @@ Argument CONTAINER name of the target Docker container."
     (setq docker-cli-prompt-cont-regexp (or (plist-get curr-command :prompt-cont-regexp) ""))
     (setq params (cons (plist-get curr-command :command) (or params '())))
     (setq params (cons container params))
-    (setq params (append docker-cli-exec-arguments params))))
+    (if (plist-get curr-command :exec-arguments-func)
+        (setq params (append (apply (plist-get curr-command :exec-arguments-func) nil) params))
+      (setq params (append docker-cli-exec-arguments params)))))
 
 (defun docker-cli ()
   "Run an inferior instance of `docker' inside Emacs."
