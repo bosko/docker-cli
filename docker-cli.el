@@ -171,20 +171,24 @@ Argument CONTAINER name of the target Docker container."
   (interactive)
   (let* ((curr-command-name (completing-read
                              "Command: "
-                             (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist))))
+                             (mapcar 'symbol-name (mapcar 'car docker-cli-commands-alist)) nil t))
          (container (completing-read
                      "Container: "
-                     (split-string (shell-command-to-string "docker ps --format '{{.Names}}'"))))
-         (buffer-name (format "%s-%s" container curr-command-name))
-         (buffer (get-buffer-create (format "*%s*" buffer-name))))
+                     (split-string (shell-command-to-string "docker ps --format '{{.Names}}'")) nil t))
+         (buffer-name)
+         (buffer))
 
-    (pop-to-buffer-same-window buffer)
+    (if (and (not (string= "" curr-command-name)) (not (string= "" container)))
+        (progn
+          (setq buffer-name (format "%s-%s" container curr-command-name))
+          (setq buffer (get-buffer-create (format "*%s*" buffer-name)))
+          (pop-to-buffer-same-window buffer)
 
-    ;; create the comint process
-    (unless (comint-check-proc buffer)
-      (apply 'make-comint-in-buffer buffer-name buffer
-             docker-cli-cmd nil (docker-cli-compose-params-for curr-command-name container)))
-    (docker-cli-mode)))
+          ;; create the comint process
+          (unless (comint-check-proc buffer)
+            (apply 'make-comint-in-buffer buffer-name buffer
+                   docker-cli-cmd nil (docker-cli-compose-params-for curr-command-name container)))
+          (docker-cli-mode)))))
 
 (defun docker-cli--initialize ()
   "Helper function to initialize Docker."
