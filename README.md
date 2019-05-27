@@ -27,7 +27,7 @@ they can be composed through `:arguments-compose-func` part of list
 element and regular expression for comint prompt handling (view comint
 mode for details).
 
-```
+```lisp
 (defun railsc-arguments () '("exec" "rails" "c"))
 
 ;; This part was taken from inf-ruby
