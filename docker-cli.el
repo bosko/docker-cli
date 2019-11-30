@@ -210,7 +210,8 @@ Argument CONTAINER name of the target Docker container."
   (setq comint-prompt-read-only t)
   ;; this makes it so commands like M-{ and M-} work.
   (set (make-local-variable 'paragraph-separate) "\\'")
-  (set (make-local-variable 'paragraph-start) docker-cli-prompt-regexp))
+  (set (make-local-variable 'paragraph-start) docker-cli-prompt-regexp)
+  (setq show-trailing-whitespace nil))
 
 ;; this has to be done in a hook. grumble grumble.
 (add-hook 'docker-cli-mode-hook 'docker-cli--initialize)
